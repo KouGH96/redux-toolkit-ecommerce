@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import cartItems from '../../cartItems';
 import axios from "axios";
+import { openModal } from "./modalSlice";
 
 const initialState = {
     cartItems: [],
@@ -21,11 +22,13 @@ const url = 'https://course-api.com/react-useReducer-cart-project';
 
 export const getCartItems = createAsyncThunk('cart/getCartItems', async (name, thunkAPI) =>{
     try {
-        console.log(thunkAPI);
+        // thunkAPI.dispatch(openModal());
         const response = await axios(url);
+
         return response.data;
+
     } catch (error) {
-        console.log(error);
+        return thunkAPI.rejectWithValue('something went wrong');
     }
 })
 
@@ -65,17 +68,16 @@ const cartSlice = createSlice({
             state.isLoading = true;
         },
         [getCartItems.fulfilled]: (state, action) =>{
-            console.log(action);
             state.isLoading = false;
             state.cartItems = action.payload;
         },
-        [getCartItems.rejected]: (state) =>{
-            state.isLoading = false
+        [getCartItems.rejected]: (state, action) =>{
+            state.isLoading = false;
         },
     }
 });
 
 export const { clearCart, removeItem, increase, decrease, calculateTotals } = cartSlice.actions;
 
-console.log(cartSlice);
+console.log(cartSlice, 'cartslice');
 export default cartSlice.reducer;
